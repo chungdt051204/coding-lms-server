@@ -8,7 +8,7 @@ cartItemRouter.delete(
   middleware.verifyToken,
   new CartItemController().deleteCartItem
 );
-cartItemRouter.delete(
+cartItemRouter.post(
   `${prefix}/cartItems`,
   middleware.verifyToken,
   new CartItemController().deleteCartItemsSelected

@@ -1,7 +1,9 @@
 import optionEntity from "../models/optionModel.js";
 export class OptionService {
   getOptionsByQuestion = async ({ questionId }) => {
-    const options = await optionEntity.find({ question_id: questionId });
+    const options = await optionEntity
+      .find({ question_id: questionId })
+      .select("question_id answer_content");
     return options || [];
   };
   addOption = async ({ questionId, options }) => {

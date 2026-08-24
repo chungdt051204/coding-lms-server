@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2";
 const courseSchema = new mongoose.Schema(
   {
     user_id: {
@@ -14,7 +15,6 @@ const courseSchema = new mongoose.Schema(
     course_name: {
       type: String,
       required: true,
-      unique: true,
     },
     description: {
       type: String,
@@ -45,9 +45,15 @@ const courseSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    rating_star: {
+      type: Number,
+      min: 0,
+      max: 5,
+      default: 0,
+    },
     is_free: {
       type: Boolean,
-      default: 0,
+      default: false,
     },
     status: {
       type: String,
@@ -56,11 +62,12 @@ const courseSchema = new mongoose.Schema(
     },
     is_visible: {
       type: Boolean,
-      default: 1,
+      default: true,
     },
   },
   {
     timestamps: true,
   }
 );
+courseSchema.plugin(paginate);
 export default mongoose.model("courseEntity", courseSchema, "Course");

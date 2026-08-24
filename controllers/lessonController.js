@@ -35,7 +35,7 @@ export class LessonController {
     try {
       const { id } = req.params;
       await new LessonService().deleteLesson({ lessonId: id });
-      return res.status(200).json({ message: "Đã xóa bài học này thành công" });
+      return res.status(200).json({ message: "Xóa bài học thành công" });
     } catch (error) {
       const status = error.statusCode || 500;
       return res

@@ -11,10 +11,13 @@ export const middleware = {
       token = token.slice(7);
       const decoded = jsonwebtoken.verify(token, process.env.JWT_SECRET);
       req.payload = decoded;
+      const user = await userEntity.findOne({ _id: decoded.sub });
+      if (user && user?.access_token !== token)
+        return res.status(401).json({ message: "Unauthorized" });
       return next();
     } catch (error) {
       if (error.name == "TokenExpiredError")
-        return res.status(403).json({ message: "Phiên đăng nhập đã hết hạn!" });
+        return res.status(401).json({ message: "Unauthorized" });
     }
   },
   isAdmin: async (req, res, next) => {
@@ -36,7 +39,10 @@ export const middleware = {
       name: "instructor",
     });
     const user = await userEntity.findOne({ _id: payload.sub });
-    if (user.role_id.toString() !== roleInstructor._id.toString())
+    if (
+      user.role_id.toString() !== roleInstructor._id.toString() &&
+      user.verified_status !== "VERIFIED"
+    )
       return res.status(403).json({
         message: "Bạn không có quyền thực hiện hành động này!",
       });

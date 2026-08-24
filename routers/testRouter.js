@@ -10,6 +10,11 @@ testRouter.get(
   new TestController().getTestsByInstructor
 );
 testRouter.get(`${prefix}/test/:id`, new TestController().getTestById);
+testRouter.get(
+  `${prefix}/course/:courseId/test`,
+  middleware.verifyToken,
+  new TestController().getTestByCourse
+);
 testRouter.post(
   `${prefix}/instructor/test/create`,
   middleware.verifyToken,
@@ -27,4 +32,10 @@ testRouter.put(
   middleware.verifyToken,
   middleware.isInstructor,
   new TestController().updateTest
+);
+testRouter.put(
+  `${prefix}/instructor/test/:id/status`,
+  middleware.verifyToken,
+  middleware.isInstructor,
+  new TestController().activeTest
 );

@@ -2,6 +2,7 @@ import questionEntity from "../models/questionModel.js";
 import optionEntity from "../models/optionModel.js";
 import testEntity from "../models/testModel.js";
 import { OptionService } from "./optionService.js";
+import { util } from "../helper/util.js";
 export class QuestionService {
   getQuestionsByTest = async ({ testId }) => {
     const test = await testEntity.findOne({ _id: testId });
@@ -18,9 +19,10 @@ export class QuestionService {
         const options = await new OptionService().getOptionsByQuestion({
           questionId: value._id,
         });
+        const shuffleArray = util.shuffleArray({ array: options });
         return {
           question: value,
-          options: options,
+          options: shuffleArray,
         };
       })
     );

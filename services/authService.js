@@ -4,6 +4,7 @@ import jsonwebtoken from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import userEntity from "../models/userModel.js";
 import { RoleService } from "./roleService.js";
+import { io } from "../script.js";
 const saltRounds = 10;
 
 export class AuthService {
@@ -31,6 +32,11 @@ export class AuthService {
       throw error;
     }
     const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+    if (data.role === undefined || !data.role) {
+      const error = new Error("Vui lòng chọn vai trò!");
+      error.statusCode = 422;
+      throw error;
+    }
     const role = await new RoleService().getRoleByName({ name: data.role });
     const newUser = await userEntity.create({
       full_name: data.fullName,
@@ -38,6 +44,11 @@ export class AuthService {
       password: hashedPassword,
       role_id: role._id,
     });
+    if (role.role === "instructor")
+      await userEntity.updateOne(
+        { _id: newUser?._id },
+        { verified_status: "NOT_VERIFIED" }
+      );
     return newUser;
   };
 
@@ -59,6 +70,20 @@ export class AuthService {
       error.statusCode = 401;
       throw error;
     }
+    if (!existingUser?.status) {
+      const error = new Error("Tài khoản này đã bị vô hiệu hóa!");
+      error.statusCode = 403;
+      throw error;
+    }
+    const token = this.generateToken({ data: existingUser })?.token;
+    await userEntity.updateOne(
+      { _id: existingUser?._id },
+      { access_token: token }
+    );
+    io.to(existingUser?._id.toString()).emit("force-logout");
     return this.generateToken({ data: existingUser });
+  };
+  Logout = async ({ userId }) => {
+    await userEntity.updateOne({ _id: userId }, { access_token: null });
   };
 }

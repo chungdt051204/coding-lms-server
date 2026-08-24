@@ -5,8 +5,11 @@ export class TestController {
   getTestsByInstructor = async (req, res) => {
     try {
       const payload = req.payload;
+      const params = req.query;
+      console.log(params);
       const result = await new TestService().getTestsByInstructor({
         instructorId: payload.sub,
+        params,
       });
       return res.status(200).json({ data: result });
     } catch (error) {
@@ -20,6 +23,18 @@ export class TestController {
     try {
       const { id } = req.params;
       const result = await new TestService().getTestById({ testId: id });
+      return res.status(200).json({ data: result });
+    } catch (error) {
+      const status = error.statusCode || 500;
+      return res
+        .status(status)
+        .json({ message: error.message || "Lỗi hệ thống" });
+    }
+  };
+  getTestByCourse = async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      const result = await new TestService().getTestByCourse({ courseId });
       return res.status(200).json({ data: result });
     } catch (error) {
       const status = error.statusCode || 500;
@@ -113,6 +128,20 @@ export class TestController {
       return res
         .status(200)
         .json({ message: "Cập nhật bài kiểm tra thành công", data: result });
+    } catch (error) {
+      const status = error.statusCode || 500;
+      return res
+        .status(status)
+        .json({ message: error.message || "Lỗi hệ thống" });
+    }
+  };
+  activeTest = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const result = await new TestService().activeTest({ testId: id });
+      return res
+        .status(200)
+        .json({ message: "Kích hoạt bài kiểm tra thành công", data: result });
     } catch (error) {
       const status = error.statusCode || 500;
       return res

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2";
 const enrollmentSchema = new mongoose.Schema(
   {
     user_id: {
@@ -16,6 +17,16 @@ const enrollmentSchema = new mongoose.Schema(
       enum: ["LIMITED", "UNLIMITED"],
       required: true,
     },
+    total_lessons: {
+      type: Number,
+      min: 0,
+      required: true,
+    },
+    completed_lessons: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
     progress_percent: {
       type: Number,
       min: 0,
@@ -24,6 +35,7 @@ const enrollmentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+enrollmentSchema.plugin(paginate);
 export default mongoose.model(
   "enrollmentEntity",
   enrollmentSchema,

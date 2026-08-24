@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2";
 const userSchema = new mongoose.Schema(
   {
     full_name: {
@@ -34,9 +35,38 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    level: {
+      type: String,
+      enum: ["Cử nhân", "Thạc sĩ", "Tiến sĩ"],
+    },
+    experience: {
+      type: Number,
+      min: 0,
+      max: 20,
+    },
+    verified_status: {
+      type: String,
+      enum: ["NOT_VERIFIED", "PENDING", "VERIFIED", "REJECTED"],
+    },
+    front_id_card: {
+      type: String,
+    },
+    back_id_card: {
+      type: String,
+    },
+    degree_certificate: {
+      type: String,
+    },
+    balance: {
+      type: Number,
+    },
+    access_token: {
+      type: String,
+    },
   },
   {
     timestamps: true,
   }
 );
+userSchema.plugin(paginate);
 export default mongoose.model("userEntity", userSchema, "User");

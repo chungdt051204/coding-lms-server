@@ -19,14 +19,13 @@ export class CartItemController {
   };
   deleteCartItemsSelected = async (req, res) => {
     try {
-      const { cartItemIds } = req.query;
-      const arrayCartItemId = cartItemIds.split(","); //Biến chuỗi thành mảng
-      console.log(arrayCartItemId);
+      const cartItemIds = req.body;
+      console.log(cartItemIds);
       await new CartItemService().deletedCartItemsSelected({
-        cartItemIds: arrayCartItemId,
+        cartItemIds,
       });
       return res.status(200).json({
-        message: `Đã xóa ${arrayCartItemId?.length} khóa học ra khỏi giỏ hàng thành công`,
+        message: `Đã xóa ${cartItemIds?.length} khóa học ra khỏi giỏ hàng thành công`,
       });
     } catch (error) {
       const status = error.statusCode || 500;

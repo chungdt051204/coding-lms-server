@@ -7,6 +7,7 @@ export class CategoryService {
       categories?.map(async (value) => {
         const numberCourse = await courseEntity.countDocuments({
           category_id: value._id,
+          status: "approved",
         });
         return { item: value, numberCourse };
       })

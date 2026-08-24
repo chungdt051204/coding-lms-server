@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import paginate from "mongoose-paginate-v2";
 const testSchema = new mongoose.Schema(
   {
     course_id: {
@@ -20,7 +21,7 @@ const testSchema = new mongoose.Schema(
       enum: [50, 60, 70, 80, 90],
       required: true,
     },
-    status: {
+    is_active: {
       type: Boolean,
       default: false,
     },
@@ -29,4 +30,5 @@ const testSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+testSchema.plugin(paginate);
 export default mongoose.model("testEntity", testSchema, "Test");

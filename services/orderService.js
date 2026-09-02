@@ -182,7 +182,7 @@ export class OrderService {
         ? order.applied_amount + Number(params.amount)
         : Number(params.amount);
     const notificationService = new NotificationService();
-    if (params.status != 1) {
+    if (params.status != 1 && currentStatus == "PENDING") {
       await orderEntity.updateOne(
         { _id: order._id },
         { payment_status: "FAILED" }

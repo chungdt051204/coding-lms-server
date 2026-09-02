@@ -126,7 +126,7 @@ export class UserController {
       });
       return res
         .status(200)
-        .json({ message: "Gửi yêu cầu xét thực thành công" });
+        .json({ message: "Gửi yêu cầu xác thực thành công" });
     } catch (error) {
       const status = error.statusCode || 500;
       return res
@@ -142,7 +142,7 @@ export class UserController {
       });
       return res
         .status(200)
-        .json({ message: "Hủy yêu cầu xét thực thành công" });
+        .json({ message: "Hủy yêu cầu xác thực thành công" });
     } catch (error) {
       const status = error.statusCode || 500;
       return res

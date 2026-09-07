@@ -40,7 +40,6 @@ export class OrderController {
     try {
       const params = req.query;
       const result = await new OrderService().getResultZaloPayment({ params });
-      console.log(result);
       return res.redirect(
         `${process.env.URL_FRONTEND}/my-orders?status=${result.status}`
       );

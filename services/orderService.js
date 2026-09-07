@@ -70,9 +70,10 @@ export class OrderService {
         },
       }
     );
+    const expired_at = new Date(Date.now() + 15 * 60 * 1000);
     await orderEntity.updateOne(
       { _id: newOrder?._id },
-      { transaction_id: appTransId }
+      { transaction_id: appTransId, expired_at }
     );
     return response.data;
   };
@@ -300,9 +301,10 @@ export class OrderService {
       { _id: admin?._id },
       { $inc: { balance: totalAdminProfit } }
     );
-    return { status: paymentStatus };
+    return { status: paymentStatus, data };
   };
   getOrders = async ({ params }) => {
+    await this.cancelOrdersByAdmin();
     const options = {
       page: params.page,
       limit: params.limit,
@@ -314,9 +316,13 @@ export class OrderService {
       query.payment_status = params.status;
     }
     const orders = await orderEntity.paginate(query, options);
-    return { items: orders?.docs, totalPages: orders?.totalPages };
+    return {
+      items: orders?.docs,
+      totalPages: orders?.totalPages,
+    };
   };
   getOrdersByUser = async ({ userId, params }) => {
+    await this.cancelOrdersByUser({ userId });
     const options = {
       page: params.page,
       limit: params.limit,
@@ -337,5 +343,31 @@ export class OrderService {
       throw error;
     }
     return order;
+  };
+  cancelOrdersByUser = async ({ userId }) => {
+    const orders = await orderEntity.find({ payment_status: "PENDING" });
+    await Promise.all(
+      orders?.map(async (value) => {
+        await orderEntity.updateOne(
+          { _id: value._id },
+          { payment_status: "FAILED" }
+        );
+        await new NotificationService().createNotification({
+          userId,
+          type: "PAYMENT",
+          title: "Thanh toán thất bại",
+          message: `Thanh toán cho đơn hàng ${value._id} không thành công`,
+        });
+      })
+    );
+  };
+  cancelOrdersByAdmin = async () => {
+    await orderEntity.updateMany(
+      {
+        payment_status: "PENDING",
+        expired_at: { $lte: Date.now() },
+      },
+      { $set: { payment_status: "FAILED" } }
+    );
   };
 }

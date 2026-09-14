@@ -6,7 +6,6 @@ export class TestController {
     try {
       const payload = req.payload;
       const params = req.query;
-      console.log(params);
       const result = await new TestService().getTestsByInstructor({
         instructorId: payload.sub,
         params,

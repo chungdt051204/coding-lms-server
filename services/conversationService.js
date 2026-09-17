@@ -44,7 +44,7 @@ export class ConversationService {
     }
     const conversations = await conversationEntity
       .find({ instructor_id: instructorId })
-      .sort({ createdAt: -1 })
+      .sort({ updatedAt: -1 })
       .populate("user_id")
       .populate("course_id")
       .populate("newest_message_id")

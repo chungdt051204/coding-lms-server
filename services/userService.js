@@ -79,7 +79,7 @@ export class UserService {
     );
     return { arrayUser, totalPages: users?.totalPages };
   };
-  getInstructorById = async ({ instructorId }) => {
+  getInstructorById = async ({ instructorId, params }) => {
     const user = await userEntity
       .findOne({ _id: instructorId })
       .populate("role_id");
@@ -92,13 +92,22 @@ export class UserService {
       error.statusCode = 400;
       throw error;
     }
-    const courses = await courseEntity
-      .find({ user_id: user._id })
-      .populate("category_id");
+    const options = {
+      page: params?.page,
+      limit: params?.limit,
+      populate: ["category_id"],
+    };
+    const query = { user_id: user._id };
+    query.is_visible = true;
+    if (params?.status != "") {
+      if (params.status == "deleted") query.is_visible = false;
+      else query.status = params.status;
+    }
+    const courses = await courseEntity.paginate(query, options);
     let numberEnrollment = 0;
     let totalRevenue = 0;
     const arrayCourse = await Promise.all(
-      courses?.map(async (value) => {
+      courses?.docs?.map(async (value) => {
         const numberStudent = await enrollmentEntity.countDocuments({
           course_id: value._id,
         });
@@ -128,9 +137,10 @@ export class UserService {
       numberEnrollment,
       totalRevenue,
       arrayCourse,
+      totalPages: courses?.totalPages,
     };
   };
-  getUserById = async ({ userId }) => {
+  getUserById = async ({ userId, params }) => {
     const user = await userEntity.findOne({ _id: userId }).populate("role_id");
     if (!user) {
       const error = new Error("Không tìm thấy tài khoản người dùng này!");
@@ -147,10 +157,13 @@ export class UserService {
     const courseIds = enrollments?.map((value) => {
       return value?.course_id?._id;
     });
-    const arrayCourse = await courseEntity
-      .find({ _id: { $in: courseIds } })
-      .populate("category_id")
-      .populate("user_id");
+    const options = {
+      page: params?.page,
+      limit: params?.limit,
+      populate: ["category_id", "user_id"],
+    };
+    const query = { _id: { $in: courseIds } };
+    const arrayCourse = await courseEntity.paginate(query, options);
     const numberCourse = await enrollmentEntity.countDocuments({
       user_id: userId,
     });
@@ -162,7 +175,13 @@ export class UserService {
     orders?.forEach((value) => {
       totalAmount = totalAmount + value.applied_amount;
     });
-    return { item: user, numberCourse, arrayCourse, totalAmount };
+    return {
+      item: user,
+      numberCourse,
+      arrayCourse: arrayCourse?.docs,
+      totalPages: arrayCourse?.totalPages,
+      totalAmount,
+    };
   };
   getStudentsByInstructor = async ({ instructorId, params }) => {
     const courses = await courseEntity.find({ user_id: instructorId });

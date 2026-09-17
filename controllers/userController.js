@@ -43,8 +43,10 @@ export class UserController {
   getInstructorById = async (req, res) => {
     try {
       const { id } = req.params;
+      const params = req.query;
       const result = await new UserService().getInstructorById({
         instructorId: id,
+        params,
       });
       return res.status(200).json({ data: result });
     } catch (error) {
@@ -57,8 +59,10 @@ export class UserController {
   getUserById = async (req, res) => {
     try {
       const { id } = req.params;
+      const params = req.query;
       const result = await new UserService().getUserById({
         userId: id,
+        params,
       });
       return res.status(200).json({ data: result });
     } catch (error) {

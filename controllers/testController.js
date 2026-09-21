@@ -73,8 +73,12 @@ export class TestController {
   };
   deleteTest = async (req, res) => {
     try {
+      const payload = req.payload;
       const { id } = req.params;
-      await new TestService().deleteTest({ testId: id });
+      await new TestService().deleteTest({
+        instructorId: payload.sub,
+        testId: id,
+      });
       return res.status(200).json({ message: "Xóa bài kiểm tra thành công" });
     } catch (error) {
       const status = error.statusCode || 500;
@@ -85,6 +89,7 @@ export class TestController {
   };
   updateTest = async (req, res) => {
     try {
+      const payload = req.payload;
       const { id } = req.params;
       const { formData } = req.body;
       const questions = formData.questions;
@@ -112,6 +117,7 @@ export class TestController {
       console.log(newQuestions);
       console.log(existingQuestions);
       const result = await new TestService().updateTest({
+        instructorId: payload.sub,
         testId: id,
         formData,
       });
@@ -136,8 +142,12 @@ export class TestController {
   };
   activeTest = async (req, res) => {
     try {
+      const payload = req.payload;
       const { id } = req.params;
-      const result = await new TestService().activeTest({ testId: id });
+      const result = await new TestService().activeTest({
+        instructorId: payload.sub,
+        testId: id,
+      });
       return res
         .status(200)
         .json({ message: "Kích hoạt bài kiểm tra thành công", data: result });

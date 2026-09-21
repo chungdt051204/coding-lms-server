@@ -32,7 +32,7 @@ courseRouter.get(
 );
 courseRouter.get(`${prefix}/course/:id`, new CourseController().getCourseById);
 courseRouter.post(
-  `${prefix}/course`,
+  `${prefix}/instructor/course`,
   middleware.verifyToken,
   middleware.isInstructor,
   upload.fields([
@@ -42,7 +42,7 @@ courseRouter.post(
   new CourseController().addCourse
 );
 courseRouter.put(
-  `${prefix}/course/:id`,
+  `${prefix}/instructor/course/:id`,
   middleware.verifyToken,
   middleware.isInstructor,
   upload.fields([
@@ -50,12 +50,6 @@ courseRouter.put(
     { name: "thumbnail", maxCount: 1 },
   ]),
   new CourseController().updateCourse
-);
-courseRouter.delete(
-  `${prefix}/course/:id`,
-  middleware.verifyToken,
-  middleware.isInstructor,
-  new CourseController().deleteCourse
 );
 courseRouter.put(
   `${prefix}/instructor/course/:id/status`,

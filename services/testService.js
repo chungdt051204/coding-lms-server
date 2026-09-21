@@ -79,11 +79,22 @@ export class TestService {
     });
     return newTest;
   };
-  deleteTest = async ({ testId }) => {
+  deleteTest = async ({ instructorId, testId }) => {
     const test = await testEntity.findOne({ _id: testId });
     if (!test) {
       const error = new Error("Không tìm thấy bài kiểm tra để xóa!");
       error.statusCode = 404;
+      throw error;
+    }
+    const course = await courseEntity.findOne({ _id: test?.course_id });
+    if (!course) {
+      const error = new Error("Không tìm thấy khóa học này!");
+      error.statusCode = 404;
+      throw error;
+    }
+    if (course?.user_id != instructorId) {
+      const error = new Error("Bạn không có quyền thực hiện hành động này!");
+      error.statusCode = 403;
       throw error;
     }
     const questions = await questionEntity.find({ test_id: testId });
@@ -91,13 +102,24 @@ export class TestService {
     await new QuestionService().deleteQuestions({ testId });
     await new OptionService().deleteOptions({ questions });
   };
-  updateTest = async ({ testId, formData }) => {
+  updateTest = async ({ instructorId, testId, formData }) => {
     const test = await testEntity.findOne({ _id: testId });
     if (!test) {
       const error = new Error(
         "Không tìm thấy bài kiểm tra để chỉnh sửa thông tin!"
       );
       error.statusCode = 404;
+      throw error;
+    }
+    const course = await courseEntity.findOne({ _id: test?.course_id });
+    if (!course) {
+      const error = new Error("Không tìm thấy khóa học này!");
+      error.statusCode = 404;
+      throw error;
+    }
+    if (course?.user_id != instructorId) {
+      const error = new Error("Bạn không có quyền thực hiện hành động này!");
+      error.statusCode = 403;
       throw error;
     }
     const result = await testEntity
@@ -119,11 +141,22 @@ export class TestService {
     });
     return { test: result, numberQuestion };
   };
-  activeTest = async ({ testId }) => {
+  activeTest = async ({ instructorId, testId }) => {
     const test = await testEntity.findOne({ _id: testId });
     if (!test) {
       const error = new Error("Bài kiểm tra này không tồn tại!");
       error.statusCode = 404;
+      throw error;
+    }
+    const course = await courseEntity.findOne({ _id: test?.course_id });
+    if (!course) {
+      const error = new Error("Không tìm thấy khóa học này!");
+      error.statusCode = 404;
+      throw error;
+    }
+    if (course?.user_id != instructorId) {
+      const error = new Error("Bạn không có quyền thực hiện hành động này!");
+      error.statusCode = 403;
       throw error;
     }
     const result = await testEntity

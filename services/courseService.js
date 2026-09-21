@@ -202,11 +202,22 @@ export class CourseService {
       lessons,
     };
   };
-  updateCourse = async ({ courseId, formData, image_url, thumbnail_url }) => {
+  updateCourse = async ({
+    userId,
+    courseId,
+    formData,
+    image_url,
+    thumbnail_url,
+  }) => {
     const course = await courseEntity.findOne({ _id: courseId });
     if (!course) {
       const error = new Error("Không tìm thấy khóa học này!");
       error.statusCode = 404;
+      throw error;
+    }
+    if (course?.user_id != userId) {
+      const error = new Error("Bạn không có quyền thực hiện hành động này!");
+      error.statusCode = 403;
       throw error;
     }
     const result = await courseEntity
@@ -229,16 +240,7 @@ export class CourseService {
       .populate("category_id");
     return result;
   };
-  deleteCourse = async ({ courseId }) => {
-    const result = await courseEntity.findOneAndDelete({ _id: courseId });
-    if (!result) {
-      const error = new Error("Không tìm thấy khóa học để xóa!");
-      error.statusCode = 404;
-      throw error;
-    }
-    return result;
-  };
-  submitOrUnSubmitCourse = async ({ courseId, status }) => {
+  submitOrUnSubmitCourse = async ({ userId, courseId, status }) => {
     const allowedStatus = ["pending", "draft"];
     if (!allowedStatus.includes(status)) {
       const error = new Error(
@@ -255,6 +257,11 @@ export class CourseService {
         "Không tìm thấy khóa học để cập nhật trạng thái!"
       );
       error.statusCode = 404;
+      throw error;
+    }
+    if (course?.user_id?._id != userId) {
+      const error = new Error("Bạn không có quyền thực hiện hành động này!");
+      error.statusCode = 403;
       throw error;
     }
     if (course.status !== "approved") {
@@ -343,7 +350,7 @@ export class CourseService {
       throw error;
     }
   };
-  deleteOrRestoreCourse = async ({ courseId, action }) => {
+  deleteOrRestoreCourse = async ({ userId, courseId, action }) => {
     const allowedStatus = ["draft", "rejected"];
     const allowedActions = ["delete", "restore"];
     const course = await courseEntity.findOne({ _id: courseId });
@@ -352,6 +359,11 @@ export class CourseService {
         "Không tìm thấy khóa học để thực hiện hành động này!"
       );
       error.statusCode = 404;
+      throw error;
+    }
+    if (course?.user_id != userId) {
+      const error = new Error("Bạn không có quyền thực hiện hành động này!");
+      error.statusCode = 403;
       throw error;
     }
     if (!allowedStatus.includes(course.status)) {

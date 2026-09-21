@@ -101,6 +101,7 @@ export class CourseController {
   };
   updateCourse = async (req, res) => {
     try {
+      const payload = req.payload;
       const { id } = req.params;
       const formData = req.body;
       const image_url = req?.files?.["image"]?.[0]?.path || formData.image;
@@ -135,6 +136,7 @@ export class CourseController {
         validateForm.validateFormCourse({ courseInfo: formData, categoryIds })
       ) {
         const result = await new CourseService().updateCourse({
+          userId: payload.sub,
           courseId: id,
           formData,
           image_url,
@@ -162,25 +164,14 @@ export class CourseController {
         .json({ message: error.message || "Lỗi hệ thống" });
     }
   };
-  deleteCourse = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const result = await new CourseService().deleteCourse({ courseId: id });
-      await new LessonService().deleteLessons({ courseId: id });
-      return res.status(200).json({ message: "Xóa thành công", data: result });
-    } catch (error) {
-      const status = error.statusCode || 500;
-      return res
-        .status(status)
-        .json({ message: error.message || "Lỗi hệ thống" });
-    }
-  };
   submitOrUnSubmitCourse = async (req, res) => {
     try {
+      const payload = req.payload;
       const { id } = req.params;
       const { status } = req.query;
-
+      console.log(payload.sub);
       const result = await new CourseService().submitOrUnSubmitCourse({
+        userId: payload.sub,
         courseId: id,
         status,
       });
@@ -224,9 +215,11 @@ export class CourseController {
   };
   deleteOrRestoreCourse = async (req, res) => {
     try {
+      const payload = req.payload;
       const { id } = req.params;
       const { action } = req.query;
       const result = await new CourseService().deleteOrRestoreCourse({
+        userId: payload.sub,
         courseId: id,
         action,
       });

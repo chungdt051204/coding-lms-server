@@ -6,6 +6,7 @@ const courseSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "userEntity",
       required: true,
+      index: true,
     },
     category_id: {
       type: mongoose.Schema.ObjectId,
@@ -69,5 +70,35 @@ const courseSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+//Lọc + Sắp xếp
+courseSchema.index({
+  status: 1,
+  is_visible: 1,
+  category_id: 1,
+  level: 1,
+  rating_star: -1,
+});
+courseSchema.index({
+  status: 1,
+  is_visible: 1,
+  category_id: 1,
+  level: 1,
+  createdAt: -1,
+});
+courseSchema.index({
+  status: 1,
+  is_visible: 1,
+  category_id: 1,
+  level: 1,
+  price: 1,
+});
+//Hiển thị
+courseSchema.index({
+  status: 1,
+  is_visible: 1,
+  createdAt: -1,
+});
+//Tìm kiếm theo từ khóa
+courseSchema.index({ course_name: "text" });
 courseSchema.plugin(paginate);
 export default mongoose.model("courseEntity", courseSchema, "Course");

@@ -5,6 +5,7 @@ const optionSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "questionEntity",
       required: true,
+      index: true,
     },
     answer_content: {
       type: String,

@@ -50,5 +50,7 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+orderSchema.index({ user_id: 1, payment_status: 1, createdAt: -1 });
+orderSchema.index({ user_id: 1, createdAt: -1 });
 orderSchema.plugin(paginate);
 export default mongoose.model("orderEntity", orderSchema, "Order");

@@ -46,15 +46,4 @@ export class EnrollmentController {
         .json({ message: error.message || "Lỗi hệ thống" });
     }
   };
-  getAllEnrollments = async (req, res) => {
-    try {
-      const result = await new EnrollmentService().getAllEnrollments();
-      return res.status(200).json({ data: result });
-    } catch (error) {
-      const status = error.statusCode || 500;
-      return res
-        .status(status)
-        .json({ message: error.message || "Lỗi hệ thống" });
-    }
-  };
 }

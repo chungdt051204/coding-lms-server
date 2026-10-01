@@ -5,6 +5,7 @@ const cartSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "userEntity",
       required: true,
+      index: true,
     },
   },
   {

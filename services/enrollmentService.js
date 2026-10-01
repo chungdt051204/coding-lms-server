@@ -28,6 +28,7 @@ export class EnrollmentService {
       page: params?.page,
       limit: params?.limit,
       populate: ["course_id"],
+      sort: { createdAt: -1 },
     };
     let query = { user_id: userId };
     const enrollments = await enrollmentEntity.paginate(query, options);
@@ -56,10 +57,6 @@ export class EnrollmentService {
       throw error;
     }
     return enrollment;
-  };
-  getAllEnrollments = async () => {
-    const enrollments = await enrollmentEntity.find();
-    return enrollments || [];
   };
   updateEnrollment = async ({ enrollmentId, progressPercent }) => {
     const enrollment = await enrollmentEntity.findOne({ _id: enrollmentId });

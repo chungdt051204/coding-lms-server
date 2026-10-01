@@ -265,32 +265,23 @@ export class CourseService {
       throw error;
     }
     if (course.status !== "approved") {
-      const result = await courseEntity
-        .findOneAndUpdate(
-          { _id: courseId },
-          { status },
-          { returnDocument: "after" }
-        )
-        .populate("category_id");
-      const numberEnrollment = await enrollmentEntity.countDocuments({
-        course_id: result,
-      });
+      await courseEntity.updateOne({ _id: courseId }, { status });
       const role = await roleEntity.findOne({ role: "admin" });
       const admin = await userEntity.findOne({ role_id: role?._id });
-      await new NotificationService().createNotification({
-        message:
-          status == "pending"
-            ? `${course?.user_id?.full_name} đã gửi yêu cầu xét duyệt khóa học cho bạn`
-            : `${course?.user_id?.full_name} đã hủy yêu cầu xét duyệt khóa học`,
-        title:
-          status == "pending"
-            ? "Yêu cầu xét duyệt khóa học"
-            : "Hủy yêu cầu xét duyệt khóa học",
-        type: "COURSE",
-        userId: admin?._id,
-      });
-      io.to(admin?._id?.toString()).emit("course-review");
-      return { course: result, numberEnrollment };
+      const newNotification =
+        await new NotificationService().createNotification({
+          message:
+            status == "pending"
+              ? `${course?.user_id?.full_name} đã gửi yêu cầu xét duyệt khóa học cho bạn`
+              : `${course?.user_id?.full_name} đã hủy yêu cầu xét duyệt khóa học`,
+          title:
+            status == "pending"
+              ? "Yêu cầu xét duyệt khóa học"
+              : "Hủy yêu cầu xét duyệt khóa học",
+          type: "COURSE",
+          userId: admin?._id,
+        });
+      io.to(admin?._id?.toString()).emit("course-review", newNotification);
     } else {
       const error = new Error(
         "Khóa học đã được đăng tải, không thể thay đổi trạng thái!"
@@ -319,31 +310,24 @@ export class CourseService {
       throw error;
     }
     if (course.status === "pending") {
-      const result = await courseEntity
-        .findOneAndUpdate(
-          { _id: courseId },
-          { status },
-          { returnDocument: "after" }
-        )
-        .populate("category_id")
-        .populate("user_id");
-      const numberEnrollment = await enrollmentEntity.countDocuments({
-        course_id: result,
-      });
-      await new NotificationService().createNotification({
-        message:
-          status == "approved"
-            ? "Yêu cầu xét duyệt khóa học của bạn đã được quản trị viên duyệt"
-            : `Lý do: ${message}`,
-        title:
-          status === "approved"
-            ? "Xét duyệt khóa học thành công"
-            : "Yêu cầu xét duyệt khóa học của bạn đã bị quản trị viên từ chối",
-        type: "COURSE",
-        userId: course?.user_id?._id,
-      });
-      io.to(course?.user_id?._id?.toString()).emit("course-review-result");
-      return { course: result, numberEnrollment };
+      await courseEntity.updateOne({ _id: courseId }, { status });
+      const newNotification =
+        await new NotificationService().createNotification({
+          message:
+            status == "approved"
+              ? "Yêu cầu xét duyệt khóa học của bạn đã được quản trị viên duyệt"
+              : `Lý do: ${message}`,
+          title:
+            status === "approved"
+              ? "Xét duyệt khóa học thành công"
+              : "Yêu cầu xét duyệt khóa học của bạn đã bị quản trị viên từ chối",
+          type: "COURSE",
+          userId: course?.user_id?._id,
+        });
+      io.to(course?.user_id?._id?.toString()).emit(
+        "course-review-result",
+        newNotification
+      );
     } else {
       const error = new Error("không thể thay đổi trạng thái của khóa học!");
       error.statusCode = 400;

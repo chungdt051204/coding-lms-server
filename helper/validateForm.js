@@ -48,7 +48,7 @@ export const validateForm = {
       }
     }
 
-    // 3. Kiểm tra Password (Nếu có)
+    // Kiểm tra Password (Nếu có)
     if (formData.password !== undefined) {
       if (!formData.password) {
         const error = new Error("Mật khẩu không được bỏ trống");

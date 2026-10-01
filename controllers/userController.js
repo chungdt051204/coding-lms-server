@@ -124,13 +124,13 @@ export class UserController {
         degreeCertificate,
       };
       console.log(images);
-      await new UserService().sendRequestVerification({
+      const result = await new UserService().sendRequestVerification({
         userId: payload.sub,
         images,
       });
       return res
         .status(200)
-        .json({ message: "Gửi yêu cầu xác thực thành công" });
+        .json({ message: "Gửi yêu cầu xác thực thành công", data: result });
     } catch (error) {
       const status = error.statusCode || 500;
       return res
@@ -141,12 +141,12 @@ export class UserController {
   cancelRequestVerification = async (req, res) => {
     try {
       const payload = req.payload;
-      await new UserService().cancelRequestVerification({
+      const result = await new UserService().cancelRequestVerification({
         userId: payload.sub,
       });
       return res
         .status(200)
-        .json({ message: "Hủy yêu cầu xác thực thành công" });
+        .json({ message: "Hủy yêu cầu xác thực thành công", data: result });
     } catch (error) {
       const status = error.statusCode || 500;
       return res
@@ -181,13 +181,13 @@ export class UserController {
     const payload = req.payload;
     const formData = req.body;
     const avatar = req?.file?.path || formData.avatar;
-    await new UserService().updateAvatar({
+    const result = await new UserService().updateAvatar({
       userId: payload.sub,
       avatar,
     });
     return res
       .status(200)
-      .json({ message: "Cập nhật ảnh đại diện thành công" });
+      .json({ message: "Cập nhật ảnh đại diện thành công", data: result });
   };
   updateProfile = async (req, res) => {
     try {
@@ -195,12 +195,13 @@ export class UserController {
       const formData = req.body;
       console.log(formData);
       if (validateForm.validateUserForm({ formData })) {
-        await new UserService().updateProfile({
+        const result = await new UserService().updateProfile({
           userId: payload.sub,
           formData,
         });
         return res.status(200).json({
           message: "Cập nhật thông tin tài khoản thành công",
+          data: result,
         });
       }
     } catch (error) {
@@ -215,12 +216,13 @@ export class UserController {
       const payload = req.payload;
       const formData = req.body;
       console.log(formData);
-      await new UserService().changePassword({
+      const result = await new UserService().changePassword({
         userId: payload.sub,
         password: formData?.password,
       });
       return res.status(200).json({
         message: "Thay đổi mật khẩu thành công",
+        data: result,
       });
     } catch (error) {
       const status = error.statusCode || 500;

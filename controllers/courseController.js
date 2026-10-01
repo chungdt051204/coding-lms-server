@@ -170,7 +170,7 @@ export class CourseController {
       const { id } = req.params;
       const { status } = req.query;
       console.log(payload.sub);
-      const result = await new CourseService().submitOrUnSubmitCourse({
+      await new CourseService().submitOrUnSubmitCourse({
         userId: payload.sub,
         courseId: id,
         status,
@@ -180,7 +180,6 @@ export class CourseController {
           status === "pending"
             ? "Đăng tải khóa học thành công"
             : "Hủy đăng tải khóa học thành công",
-        data: result,
       });
     } catch (error) {
       const status = error.statusCode || 500;
@@ -194,7 +193,7 @@ export class CourseController {
       const { id } = req.params;
       const { status } = req.query;
       const { message } = req.body;
-      const result = await new CourseService().approveOrRejectCourse({
+      await new CourseService().approveOrRejectCourse({
         courseId: id,
         status,
         message,
@@ -204,7 +203,6 @@ export class CourseController {
           status === "approved"
             ? "Duyệt khóa học thành công"
             : "Từ chối khóa học thành công",
-        data: result,
       });
     } catch (error) {
       const status = error.statusCode || 500;

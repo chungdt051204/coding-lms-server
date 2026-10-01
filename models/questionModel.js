@@ -20,4 +20,5 @@ const questionSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+questionSchema.index({ test_id: 1 });
 export default mongoose.model("questionEntity", questionSchema, "Question");

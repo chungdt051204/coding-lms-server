@@ -30,5 +30,8 @@ const testSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+testSchema.index({ course_id: 1 }, { unique: true });
+testSchema.index({ course_id: 1, is_active: 1, createdAt: -1 });
+testSchema.index({ course_id: 1, createdAt: -1 });
 testSchema.plugin(paginate);
 export default mongoose.model("testEntity", testSchema, "Test");

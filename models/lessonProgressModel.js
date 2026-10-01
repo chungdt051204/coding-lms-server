@@ -23,6 +23,7 @@ const lessonProgressSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+lessonProgressSchema.index({ user_id: 1, lesson_id: 1 }, { unique: true });
 export default mongoose.model(
   "lessonProgressEntity",
   lessonProgressSchema,

@@ -5,6 +5,7 @@ const lessonSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "courseEntity",
       required: true,
+      index: true,
     },
     lesson_name: {
       type: String,

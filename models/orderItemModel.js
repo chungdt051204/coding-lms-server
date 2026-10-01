@@ -33,4 +33,5 @@ const orderItemSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+orderItemSchema.index({ order_id: 1, course_id: 1 }, { unique: true });
 export default mongoose.model("orderItemEntity", orderItemSchema, "Order Item");

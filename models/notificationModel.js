@@ -4,6 +4,7 @@ const notificationSchema = new mongoose.Schema(
     user_id: {
       type: mongoose.Schema.ObjectId,
       ref: "userEntity",
+      required: true,
     },
     type: {
       type: String,
@@ -27,6 +28,8 @@ const notificationSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+notificationSchema.index({ user_id: 1, createdAt: -1 });
+notificationSchema.index({ user_id: 1, is_read: 1 });
 export default mongoose.model(
   "notificationEntity",
   notificationSchema,

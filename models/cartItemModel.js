@@ -14,4 +14,5 @@ const cartItemSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+cartItemSchema.index({ cart_id: 1, course_id: 1 }, { unique: true });
 export default mongoose.model("cartItemEntity", cartItemSchema, "Cart Item");

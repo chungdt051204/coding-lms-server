@@ -31,7 +31,6 @@ import { conversationRouter } from "./routers/conversationRouter.js";
 import { aiRouter } from "./routers/aiRouter.js";
 import { MessageService } from "./services/messageService.js";
 import { NotificationService } from "./services/notificationService.js";
-import { UserService } from "./services/userService.js";
 
 const server = createServer(app);
 export const io = new Server(server, {
@@ -80,7 +79,7 @@ io.on("connection", (socket) => {
   socket.on("send-message", async (data) => {
     const result = await new MessageService().postMessage({ data });
     socket.join(result?.conversationId.toString());
-    io.to(data.instructorId).emit("new-message", result); //Gửi đến room Instructor
+    io.to(data.instructorId).emit("new-message"); //Gửi đến room Instructor
     io.to(result?.conversationId.toString()).emit("received-message", result); // Gửi đến room Conversation
   });
   socket.on("post-comment", async (data) => {

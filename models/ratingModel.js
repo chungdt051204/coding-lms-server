@@ -30,5 +30,8 @@ const ratingSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+ratingSchema.index({ course_id: 1, createdAt: -1 });
+ratingSchema.index({ status: 1, createdAt: -1 });
+ratingSchema.index({ createdAt: -1 });
 ratingSchema.plugin(paginate);
 export default mongoose.model("ratingEntity", ratingSchema, "Rating");

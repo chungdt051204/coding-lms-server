@@ -25,6 +25,8 @@ const conversationSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+conversationSchema.index({ user_id: 1, course_id: 1 }, { unique: true });
+conversationSchema.index({ instructor_id: 1, updatedAt: -1 }, { unique: true });
 export default mongoose.model(
   "conversationEntity",
   conversationSchema,

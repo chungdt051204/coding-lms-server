@@ -13,9 +13,3 @@ enrollmentRouter.get(
   middleware.verifyToken,
   new EnrollmentController().getEnrollmentsByUser
 );
-enrollmentRouter.get(
-  `${prefix}/enrollments`,
-  middleware.verifyToken,
-  middleware.isInstructor,
-  new EnrollmentController().getAllEnrollments
-);

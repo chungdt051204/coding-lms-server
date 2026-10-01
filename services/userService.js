@@ -254,24 +254,29 @@ export class UserService {
       error.statusCode = 404;
       throw error;
     }
-    await userEntity.updateOne(
-      { _id: userId },
-      {
-        front_id_card: images?.frontIdCard,
-        back_id_card: images?.backIdCard,
-        degree_certificate: images?.degreeCertificate,
-        verified_status: "PENDING",
-      }
-    );
+    const result = await userEntity
+      .findOneAndUpdate(
+        { _id: userId },
+        {
+          front_id_card: images?.frontIdCard,
+          back_id_card: images?.backIdCard,
+          degree_certificate: images?.degreeCertificate,
+          verified_status: "PENDING",
+        },
+        { returnDocument: "after" }
+      )
+      .populate("role_id")
+      .select("-password");
     const role = await roleEntity.findOne({ role: "admin" });
     const admin = await userEntity.findOne({ role_id: role?._id });
-    await new NotificationService().createNotification({
+    const newNotification = await new NotificationService().createNotification({
       message: `${instructor?.full_name} đã gửi yêu cầu xác thực tài khoản cho bạn`,
       title: "Yêu cầu xác thực tài khoản",
       type: "ACCOUNT",
       userId: admin?._id,
     });
-    io.to(admin?._id?.toString()).emit("account-review");
+    io.to(admin?._id?.toString()).emit("account-review", newNotification);
+    return result;
   };
   cancelRequestVerification = async ({ userId }) => {
     const instructor = await userEntity.findOne({ _id: userId });
@@ -280,21 +285,26 @@ export class UserService {
       error.statusCode = 404;
       throw error;
     }
-    await userEntity.updateOne(
-      { _id: userId },
-      {
-        verified_status: "NOT_VERIFIED",
-      }
-    );
+    const result = await userEntity
+      .findOneAndUpdate(
+        { _id: userId },
+        {
+          verified_status: "NOT_VERIFIED",
+        },
+        { returnDocument: "after" }
+      )
+      .populate("role_id")
+      .select("-password");
     const role = await roleEntity.findOne({ role: "admin" });
     const admin = await userEntity.findOne({ role_id: role?._id });
-    await new NotificationService().createNotification({
+    const newNotification = await new NotificationService().createNotification({
       message: `${instructor?.full_name} đã hủy yêu cầu xác thực tài khoản`,
       title: "Hủy yêu cầu xác thực tài khoản",
       type: "ACCOUNT",
       userId: admin?._id,
     });
-    io.to(admin?._id?.toString()).emit("account-review");
+    io.to(admin?._id?.toString()).emit("account-review", newNotification);
+    return result;
   };
   approvedOrRejectedInstructor = async ({ instructorId, status, message }) => {
     const instructor = await userEntity.findOne({ _id: instructorId });
@@ -303,11 +313,15 @@ export class UserService {
       error.statusCode = 404;
       throw error;
     }
-    await userEntity.updateOne(
-      { _id: instructorId },
-      { verified_status: status }
-    );
-    await new NotificationService().createNotification({
+    const result = await userEntity
+      .findOneAndUpdate(
+        { _id: instructorId },
+        { verified_status: status },
+        { returnDocument: "after" }
+      )
+      .populate("role_id")
+      .select("-password");
+    const newNotification = await new NotificationService().createNotification({
       message:
         status === "VERIFIED"
           ? "Yêu cầu xác thực tài khoản của bạn đã được quản trị viên duyệt"
@@ -319,7 +333,8 @@ export class UserService {
       type: "ACCOUNT",
       userId: instructorId,
     });
-    io.to(instructorId).emit("account-review-result");
+    const data = { newNotification, result };
+    io.to(instructorId).emit("account-review-result", data);
   };
   updateAvatar = async ({ userId, avatar }) => {
     const user = await userEntity.findOne({ _id: userId });
@@ -328,7 +343,15 @@ export class UserService {
       error.statusCode = 404;
       throw error;
     }
-    await userEntity.updateOne({ _id: userId }, { avatar });
+    const result = await userEntity
+      .findOneAndUpdate(
+        { _id: userId },
+        { avatar },
+        { returnDocument: "after" }
+      )
+      .populate("role_id")
+      .select("-password");
+    return result;
   };
   updateProfile = async ({ userId, formData }) => {
     const user = await userEntity.findOne({ _id: userId });
@@ -337,14 +360,18 @@ export class UserService {
       error.statusCode = 404;
       throw error;
     }
-    // const hashedPassword = await bcrypt.hash(formData.password, saltRounds);
-    await userEntity.updateOne(
-      { _id: userId },
-      {
-        full_name: formData.fullName,
-        phone: formData.phone,
-      }
-    );
+    const result = await userEntity
+      .findOneAndUpdate(
+        { _id: userId },
+        {
+          full_name: formData.fullName,
+          phone: formData.phone,
+        },
+        { returnDocument: "after" }
+      )
+      .populate("role_id")
+      .select("-password");
+    return result;
   };
   changePassword = async ({ userId, password }) => {
     const user = await userEntity.findOne({ _id: userId });
@@ -354,7 +381,15 @@ export class UserService {
       throw error;
     }
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    await userEntity.updateOne({ _id: userId }, { password: hashedPassword });
+    const result = await userEntity
+      .findOneAndUpdate(
+        { _id: userId },
+        { password: hashedPassword },
+        { returnDocument: "after" }
+      )
+      .populate("role_id")
+      .select("-password");
+    return result;
   };
   updateStatusUser = async ({ userId }) => {
     const user = await userEntity.findOne({ _id: userId });

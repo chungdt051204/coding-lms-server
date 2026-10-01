@@ -35,6 +35,9 @@ const enrollmentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+enrollmentSchema.index({ user_id: 1, course_id: 1 }, { unique: true });
+enrollmentSchema.index({ user_id: 1, createdAt: -1 });
+enrollmentSchema.index({ course_id: 1, createdAt: -1 });
 enrollmentSchema.plugin(paginate);
 export default mongoose.model(
   "enrollmentEntity",
